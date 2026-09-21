@@ -11,7 +11,13 @@ function startsWithAny(pathname: string, prefixes: readonly string[]): boolean {
   return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
 }
 
-export async function middleware(request: NextRequest) {
+/**
+ * Runs before every matched request.
+ *
+ * Next 16 renamed the `middleware` file convention to `proxy`; the function
+ * must be the default export or be named `proxy`.
+ */
+export async function proxy(request: NextRequest) {
   // Refreshes the session cookie. Server Components cannot write cookies, so
   // this is the only place a rotating refresh token can be kept alive.
   const { response, userId } = await updateSession(request);
@@ -39,9 +45,11 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Everything except static assets and image files. The session still has
-     * to be refreshed on public pages, so the matcher is deliberately broad
-     * and the redirect decisions above are what scope the protection.
+     * Everything except static assets and image files. Without a matcher this
+     * would run on every request including _next/static, so the negative
+     * lookahead matters. The session still has to be refreshed on public
+     * pages, so the matcher is deliberately broad and the redirect decisions
+     * above are what scope the protection.
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
