@@ -24,6 +24,8 @@ const serverSchema = z.object({
   // Left optional so the foundation runs without them. Make one required in
   // the same commit that starts using it.
   ANTHROPIC_API_KEY: z.string().optional(),
+  /** 32 bytes, base64. Encrypts Strava/Google tokens at rest (D-03). */
+  TOKEN_ENCRYPTION_KEY: z.string().optional(),
   STRAVA_CLIENT_ID: z.string().optional(),
   STRAVA_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CLIENT_ID: z.string().optional(),

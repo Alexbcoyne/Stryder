@@ -95,6 +95,13 @@ pnpm db:types        # regenerate packages/types/src/database.ts
   with a cast in a component.
 - **The enum lists in `@stryder/constants` mirror the database CHECK
   constraints.** Change both in the same commit.
+- **`session_type` is assigned by Stryder, never typed by an athlete.** Manual
+  entry is a select over `SESSION_TYPES`; importers map source text onto a
+  known type and fall back to `other`. The athlete's own wording lives in
+  `title` / `description`, which is where it belongs.
+- **Third-party tokens (Strava, Google) are encrypted by our own code** before
+  storage, with the key in an env var rather than in Supabase. See D-03 — the
+  columns do not exist yet.
 - **Server actions** validate with Zod and return `{ error }` rather than
   throwing. Auth errors stay generic — never reveal whether an account exists.
 - **Money** is integer cents. **Scores** are whole numbers; `scoreBand()` floors

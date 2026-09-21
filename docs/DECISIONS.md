@@ -1,24 +1,12 @@
 # Decision log
 
 Every decision made while building that the brief did not specify, plus the
-conflicts it resolved and the questions still open.
+conflicts it resolved.
+
+No questions are currently open. Anything added here that needs a founder call
+goes under a new "Open" heading at the top.
 
 Format: **Decision** — what was chosen, why, and what would change it.
-
----
-
-## Open — needs a founder decision
-
-### D-03 Strava / Google token encryption
-
-`public.users` deliberately has **no** Strava or Google token columns yet, per
-the brief. They arrive with the integration migration once we choose between:
-
-- **Supabase Vault** — encryption at rest managed by Supabase, keys never in
-  app code. Preferred unless it turns out to be awkward from Edge Functions.
-- **Application-level encryption** — more control, more key management.
-
-Do not add token columns until this is decided.
 
 ---
 
@@ -55,6 +43,43 @@ trial lapses the same query stops selecting that athlete on its own.
 **For the session that builds the summary:** the athlete still keeps their
 dashboard, their compliance tracking and their score. Only the proactive Monday
 touchpoint stops. Losing the summary is what the upgrade prompt hangs off.
+
+### D-03 Third-party tokens: application-level encryption — SETTLED 21 Sep 2026
+
+Strava and Google access/refresh tokens are encrypted **by our own code** before
+they are written, and decrypted after they are read. Supabase Vault was
+considered and rejected.
+
+**Why not Vault.** Vault defends against someone walking off with the storage —
+a stolen disk or backup. It defends poorly against the breach a product this
+size actually suffers: a leaked service role key. Anything holding that key can
+ask Vault to decrypt for it, because the safe and its key live in the same
+system. Application-level encryption keeps the key in a different system
+entirely (Vercel env / Edge Function secret), so a stolen database is inert
+without it.
+
+**Shape for the integration session — do not build this yet:**
+
+- AES-256-GCM. Key from `TOKEN_ENCRYPTION_KEY` (32 bytes, base64), server-only,
+  never `NEXT_PUBLIC_`.
+- Store `v1:<key_id>:<iv>:<authTag>:<ciphertext>` in a single `text` column.
+  The key id prefix is what makes rotation possible later without a flag day:
+  decrypt with whichever key the row names, re-encrypt with the current one on
+  next write.
+- One module, `packages/api/src/crypto/tokens.ts`, carrying `import
+'server-only'`. Every read and write of a token goes through it — nothing
+  else touches the column. GCM's auth tag means tampering fails loudly rather
+  than silently decrypting to garbage.
+- Never log a token, plaintext or ciphertext, and never let one reach a client
+  component. Strava data is also covered by non-negotiable rule 7, so it never
+  appears in shareable output either.
+
+**Accepted cost.** Key rotation and key custody are ours. Losing the key costs
+every athlete a Strava reconnect — irritating, not destructive, because the
+tokens were never the data, only the means of fetching it.
+
+Token columns still do not exist. They arrive with the integration migration,
+alongside this module and its tests.
 
 ---
 
@@ -158,11 +183,11 @@ a free user could insert two blocks as drafts and flip the second to `active`.
 The trigger excludes the row being updated from its own count. It also fails
 closed: an unknown effective tier is treated as `free`.
 
-### D-24 Session type list
+### D-24 Session type list — CONFIRMED 21 Sep 2026
 
 The Technical Spec was not available in this session (`/docs` did not exist), so
 the enumerated lists were built from the values named in the brief plus the
-obvious basics:
+obvious basics, and then confirmed by the founder:
 
 `run, ride, swim, brick, gym, hyrox, rugby_training, gaa_training, match,
 mobility, physio, rest, other`
@@ -170,8 +195,33 @@ mobility, physio, rest, other`
 Sports: `running, triathlon, cycling, swimming, hyrox, rugby, gaa, strength,
 other`.
 
-**Check these against the spec.** Adding a value is a one-line migration plus
-the matching constant; removing one needs a data migration.
+Adding a value later is a one-line migration plus the matching constant.
+Removing or renaming one needs a data migration, because existing sessions will
+be using it — so add rather than prune.
+
+### D-24a `session_type` is assigned by Stryder, never typed by the athlete — SETTLED 21 Sep 2026
+
+The athlete never gets a free-text field that lands in `session_type`. This is
+what keeps `run` / `Run` / `runnign` from becoming three different things and
+every downstream feature — colours, icons, the compliance engine's handling of
+`rest` — from having to guess.
+
+Consequences for the sessions that build plan import and manual entry:
+
+- **Manual entry**: a select, populated from `SESSION_TYPES` in
+  `@stryder/constants`. Never a text input.
+- **Import (iCal / PDF / Strava)**: the importer maps whatever the source says
+  onto a known type. Anything it cannot map confidently becomes `other` — it
+  never invents a type, and it never fails the import over a word it does not
+  recognise.
+- **Nothing is lost.** `sessions.title` and `sessions.description` already hold
+  the athlete's own wording verbatim. `session_type` is the structured facet
+  Stryder reasons about; the title is the human one they read. A session can be
+  typed `run` and still be titled "Tuesday hills, dreading it".
+- **The mapping table belongs in code, not the database** — put it beside the
+  importer so it can grow without a migration, and log unmapped source strings
+  (the string alone, never the surrounding plan text) so the list can be
+  extended on evidence.
 
 ### D-25 `session_logs.session_id` is nullable
 
