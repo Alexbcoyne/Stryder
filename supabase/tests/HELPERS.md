@@ -6,8 +6,8 @@ session state to hang a helper off.
 
 Conventions used by the suite:
 
-  set local role authenticated;
-  set local request.jwt.claims to '{"sub":"<uuid>","role":"authenticated"}';
+set local role authenticated;
+set local request.jwt.claims to '{"sub":"<uuid>","role":"authenticated"}';
 
 puts the session in the same position as a browser client holding that user's
 JWT. `reset role;` returns to the migration role (which bypasses RLS) for
