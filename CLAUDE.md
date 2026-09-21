@@ -38,7 +38,8 @@ blocks it. In particular, keep `(marketing)` separate from `(app)`.
    tracking.
 6. **No mid-week pushes to athletes.** The Monday summary is the only proactive
    touchpoint. If you are adding a notification, the answer is almost certainly
-   no.
+   no. The summary is an Athlete-tier entitlement: free users get it during the
+   30-day trial only, which is exactly `effective_tier() <> 'free'`.
 7. **Share compliance, never content.** No plan content, session descriptions or
    Strava data in any shareable output. `ComplianceMetrics` in `@stryder/types`
    is the only shape allowed to leave an athlete's own context.

@@ -9,26 +9,6 @@ Format: **Decision** — what was chosen, why, and what would change it.
 
 ## Open — needs a founder decision
 
-### D-01 Accent colour: amber or neon green
-
-The Technical Spec uses amber `#F0A500` for the app UI; the brand (logo,
-landing page) uses neon green `#39FF14`. Amber sits behind `--accent` for now,
-as the brief directs.
-
-This needs resolving before the marketing site is built, because the two
-surfaces will sit side by side. Note that `#39FF14` is also the Elite score
-colour — using it as the accent would collide with the score system, which is
-an argument for keeping amber in-app.
-
-**Changing it is a one-line edit** to `--accent` in `apps/web/app/globals.css`.
-
-### D-02 Free-tier Monday summary
-
-Sources disagree: one says free users get the first summary only, another says
-none at all. Not needed until the summary ships, but it has to be settled
-before the Edge Function is written, because it decides whether the function
-filters on tier.
-
 ### D-03 Strava / Google token encryption
 
 `public.users` deliberately has **no** Strava or Google token columns yet, per
@@ -39,6 +19,42 @@ the brief. They arrive with the integration migration once we choose between:
 - **Application-level encryption** — more control, more key management.
 
 Do not add token columns until this is decided.
+
+---
+
+## Settled by the founder
+
+### D-01 Accent colour: amber — SETTLED 21 Sep 2026
+
+`--accent` stays amber `#F0A500` for the app UI. The brand's neon green
+`#39FF14` is not promoted to the app accent.
+
+This also keeps the score system clean: `#39FF14` is the Elite band colour, and
+a colour that means "you are crushing it" should not also mean "this is a
+button".
+
+Implemented: `--accent` in `apps/web/app/globals.css`. Nothing else to do.
+
+### D-02 Free tier gets no Monday summary — SETTLED 21 Sep 2026
+
+The Monday summary is an **Athlete-tier entitlement**. Free users get it during
+their 30-day reverse trial and then it stops. It is not a "first one free"
+teaser and there is no ongoing free allowance.
+
+The database already expresses this exactly: `public.effective_tier()` returns
+`athlete` for a free user with an open trial and `free` once it expires. So the
+Edge Function's filter is simply:
+
+```sql
+where public.effective_tier(u.id) <> 'free'
+```
+
+No extra column, no extra flag, no date arithmetic in the function. When the
+trial lapses the same query stops selecting that athlete on its own.
+
+**For the session that builds the summary:** the athlete still keeps their
+dashboard, their compliance tracking and their score. Only the proactive Monday
+touchpoint stops. Losing the summary is what the upgrade prompt hangs off.
 
 ---
 
