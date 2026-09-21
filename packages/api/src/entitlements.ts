@@ -21,7 +21,9 @@ export function hasTier(profile: Pick<Profile, 'tier' | 'trial_ends_at'>, requir
 }
 
 /** Whole days left in the reverse trial, or null when no trial is running. */
-export function trialDaysRemaining(profile: Pick<Profile, 'tier' | 'trial_ends_at'>): number | null {
+export function trialDaysRemaining(
+  profile: Pick<Profile, 'tier' | 'trial_ends_at'>,
+): number | null {
   if (profile.tier !== 'free' || !profile.trial_ends_at) return null;
 
   const msRemaining = new Date(profile.trial_ends_at).getTime() - Date.now();

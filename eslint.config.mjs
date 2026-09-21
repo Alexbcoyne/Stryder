@@ -61,6 +61,8 @@ export default tseslint.config(
       ...nextPlugin.configs.recommended.rules,
       ...nextPlugin.configs['core-web-vitals'].rules,
       ...reactHooks.configs.recommended.rules,
+      // App Router only: there is no `pages/` directory to check against.
+      '@next/next/no-html-link-for-pages': 'off',
       'react/jsx-key': 'error',
       'react/self-closing-comp': 'error',
     },

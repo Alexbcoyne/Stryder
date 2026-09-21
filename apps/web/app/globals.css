@@ -1,0 +1,161 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+ * Design tokens
+ *
+ * Every colour, radius and type decision lives here and nowhere else.
+ * Components reference tokens, never raw hex, so the palette can change
+ * without touching a single component.
+ *
+ * Design direction: structured over atmospheric, precise over glowing.
+ * No radial glows, no decorative gradients, no starfields, no fade-up-on-
+ * scroll. Motion is functional only. Geometry, rules, spacing and tabular
+ * numerals do the work.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  /* Surfaces */
+  --background: #0f1117;
+  --card: #1c1f2a;
+  --hover: #2a2e3d;
+
+  /* Text */
+  --text-primary: #f5f5f0;
+  --text-muted: #6b7280;
+
+  /* Accent.
+   * The app UI uses amber. The brand (logo, landing page) uses neon green
+   * #39FF14. Amber sits behind the token for now — this needs a founder
+   * decision, see docs/DECISIONS.md. Change it here, not in components. */
+  --accent: #f0a500;
+  --accent-contrast: #0f1117;
+
+  /* Semantic state. Never used for the Stryder Score. */
+  --success: #3fb950;
+  --error: #f85149;
+  --warning: #f59e0b;
+
+  /* Stryder Score bands. ONLY for displaying the score.
+   * Mirrors SCORE_BAND_DEFINITIONS in @stryder/constants. */
+  --score-elite: #39ff14;
+  --score-on-track: #f4c542;
+  --score-building: #ff8c42;
+  --score-needs-attention: #ff5f1f;
+
+  /* Lines and edges. Rules carry the structure, so they are a first-class token. */
+  --border: #2a2e3d;
+  --border-strong: #3a3f52;
+
+  /* Focus. Always visible — WCAG AA, non-negotiable. */
+  --focus-ring: #f0a500;
+
+  --radius: 0.375rem;
+  --radius-lg: 0.5rem;
+}
+
+/* Map tokens into the Tailwind theme so utilities such as `bg-card`,
+ * `text-muted` and `border-default` resolve to the variables above. */
+@theme inline {
+  --color-background: var(--background);
+  --color-card: var(--card);
+  --color-hover: var(--hover);
+
+  --color-primary: var(--text-primary);
+  --color-muted: var(--text-muted);
+
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  --color-score-elite: var(--score-elite);
+  --color-score-on-track: var(--score-on-track);
+  --color-score-building: var(--score-building);
+  --color-score-needs-attention: var(--score-needs-attention);
+
+  --color-default: var(--border);
+  --color-strong: var(--border-strong);
+
+  --radius-DEFAULT: var(--radius);
+  --radius-lg: var(--radius-lg);
+
+  /* Space Grotesk carries the UI. JetBrains Mono carries every number, so
+   * metrics line up in columns. --font-display is separate from --font-sans
+   * so a display face can be swapped in later without touching body copy. */
+  --font-sans: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, 'SFMono-Regular', monospace;
+}
+
+/* ---------------------------------------------------------------------------
+ * Base
+ * ------------------------------------------------------------------------- */
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Numbers are data. They align in columns and never reflow while counting. */
+  .tabular,
+  [data-metric] {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+
+  /* One visible focus treatment everywhere. Never remove it. */
+  :focus-visible {
+    outline: 2px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--accent);
+    color: var(--accent-contrast);
+  }
+}
+
+/* The panel slides in from the edge it lives on: the motion says where it came
+ * from and where closing returns it to. Nothing else animates on entry. */
+@keyframes panel-enter {
+  from {
+    transform: translateX(1rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.panel-enter {
+  animation: panel-enter 150ms ease-out;
+}
+
+/* Motion is functional only: it shows state changing, never decorates.
+ * Respect the user's preference without exception. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
