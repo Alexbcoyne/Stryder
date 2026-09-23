@@ -48,12 +48,17 @@ git clone <this repo> && cd stryder
 corepack enable
 pnpm install
 
-cp .env.example .env.local   # then fill it in — see below
+# The running app reads its env file from apps/web, not the repo root —
+# copy the template there and fill it in (see below).
+cp .env.example apps/web/.env.local
 ```
 
 ### Option A — against your hosted Supabase project
 
-Fill `.env.local` from **Supabase dashboard → Project Settings → API**:
+Fill `apps/web/.env.local` from **Supabase dashboard → Project Settings → API**:
+
+> Use the plain **Project URL** (`https://<ref>.supabase.co`), not the REST
+> API URL some dashboard pages show with `/rest/v1/` on the end.
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://<project-ref>.supabase.co
@@ -75,7 +80,7 @@ supabase db push
 ### Option B — against a local Supabase (Docker)
 
 ```bash
-pnpm db:start     # prints your local URL and keys — paste them into .env.local
+pnpm db:start     # prints your local URL and keys — paste them into apps/web/.env.local
 pnpm db:reset     # apply every migration from scratch
 pnpm db:test      # run the pgTAP RLS suite
 ```
@@ -106,8 +111,8 @@ Authorised redirect URI — this is Supabase's callback, not your app's:
 **2. Supabase** → _Authentication_ → _Providers_ → _Google_. Enable it and paste
 the client ID and secret.
 
-For local development, put them in `.env.local` instead — `supabase/config.toml`
-reads them from the environment:
+For local development, put them in `apps/web/.env.local` instead —
+`supabase/config.toml` reads them from the environment:
 
 ```
 SUPABASE_AUTH_GOOGLE_CLIENT_ID=<client id>
