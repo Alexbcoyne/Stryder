@@ -1,9 +1,11 @@
 export { Badge, type BadgeProps } from './badge';
-export { Button, type ButtonProps } from './button';
+export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './button';
+export { LinkButton, type LinkButtonProps } from './link-button';
 export { Card, CardContent, CardHeader, CardTitle, type CardProps } from './card';
 export { EmptyState, type EmptyStateProps } from './empty-state';
 export { Input, type InputProps } from './input';
 export { Label, type LabelProps } from './label';
 export { Panel, type PanelProps } from './panel';
 export { ScoreBadge, type ScoreBadgeProps } from './score-badge';
+export { Select, type SelectProps } from './select';
 export { Skeleton } from './skeleton';

@@ -12,3 +12,21 @@
 
 export { effectiveTier, hasTier, trialDaysRemaining } from './entitlements';
 export { getProfile, updateProfile, type ProfileUpdate } from './queries/profile';
+export {
+  archiveBlock,
+  createBlock,
+  FreeTierBlockLimitError,
+  getActiveBlock,
+  getBlock,
+  listBlocks,
+  type CreateBlockInput,
+} from './queries/blocks';
+export { ensureWeek, listWeeks } from './queries/weeks';
+export {
+  createSession,
+  deleteSession,
+  listSessionsForBlock,
+  updateSessionStatus,
+  type CreateSessionInput,
+} from './queries/sessions';
+export { logSession, type LogSessionInput } from './queries/session-logs';

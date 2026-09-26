@@ -53,7 +53,7 @@ apps/web/            Next.js 16 App Router
   proxy.ts           Session refresh + route protection (Next 16's middleware)
   app/(marketing)/   Reserved, empty. Public surface — keep it separate.
   app/(auth)/        login, signup, forgot-password, reset-password
-  app/(app)/         Authenticated: dashboard, settings
+  app/(app)/         Authenticated: dashboard, settings, blocks/[id], blocks/new
   app/auth/callback/ OAuth + email link code exchange
   components/ui/     Base components. Tokens only, never raw hex.
   lib/env/           Zod-validated environment (client.ts / server.ts)
@@ -130,6 +130,7 @@ Structured over atmospheric. Precise over glowing.
 
 ## Not yet built (leave clean seams, build nothing)
 
-Strava, iCal and Google Calendar import, Claude API calls, Stripe, PWA, Web
-Push, badge award logic, coach and squad features, shareable cards, Stryder
-Stories, native mobile.
+iCal, PDF and Google Calendar import (blocks/sessions are manual-entry only
+for now — see D-41), Strava, Claude API calls, Stripe, PWA, Web Push, the
+Stryder Score and streaks, badge award logic, coach and squad features,
+shareable cards, Stryder Stories, native mobile.

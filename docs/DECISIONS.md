@@ -81,6 +81,51 @@ tokens were never the data, only the means of fetching it.
 Token columns still do not exist. They arrive with the integration migration,
 alongside this module and its tests.
 
+### D-40 Weeks are computed, never entered by hand
+
+Onboarding only ever asks for a block's start and end date. `weeks` still
+exists as its own table with a real `week_number` and `start_date`, but no
+screen lets an athlete create or edit one directly — `ensureWeek()` derives
+the week a session's date falls into and inserts it on demand, upserting on
+the existing `(block_id, week_number)` unique constraint so adding a second
+session to the same week is a no-op, not a conflict.
+
+This is the pure logic in `@stryder/utils`' `weeks` module (`weekNumberForDate`,
+`weekStartDateForNumber`), tested at every boundary, plus one query function.
+The alternative — a UI for creating weeks — is real screen real estate for a
+concept athletes don't think in; they think in sessions and dates. Phase
+tagging (`base`/`build`/`peak`/`taper`) is still on the `weeks` row for
+later, once there's a UI reason to set it.
+
+### D-41 Session type stays fixed-choice; no import in this phase
+
+Sessions are created one at a time through a form with `session_type` as a
+`<select>` over `SESSION_TYPES` (per D-24a), never free text. iCal, PDF and
+Google Calendar import are still explicitly later work — this phase only
+proves the manual path: create a block, add sessions, log or skip them. That
+sequencing follows the roadmap's own order in the original brief (onboarding
+and block creation, then the board, then score/streaks, then import).
+
+### D-42 `logSession()` is two writes, not one transaction
+
+Logging a completed session writes to `session_logs` and then updates
+`sessions.status`. `@supabase/supabase-js` has no client-side multi-statement
+transaction support, so these are sequential requests rather than one atomic
+unit. If the second write fails, the log exists and the session is still
+`planned` — recoverable (the caller can retry the status flip) rather than
+silently inconsistent. Worth moving into a Postgres function if it ever needs
+to be atomic; not worth the complexity yet for a single-athlete write.
+
+### D-43 The free-tier block limit gets a real UI message
+
+The database's `enforce_free_tier_block_limit` trigger (M-4) was always the
+enforcement point (non-negotiable rule 3). `createBlock()` now catches that
+specific constraint violation (`23514`, message-matched) and raises
+`FreeTierBlockLimitError`, and `/blocks/new` checks `effective_tier` up front
+so a free athlete with an active block sees "archive or upgrade" instead of a
+raw Postgres error. The database still rejects the insert regardless of what
+the UI does first.
+
 ---
 
 ## Resolved conflicts between sources
