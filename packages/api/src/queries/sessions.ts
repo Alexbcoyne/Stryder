@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { INTENSITIES, SESSION_STATUSES, SESSION_TYPES } from '@stryder/constants';
-import type { Session, TablesInsert } from '@stryder/types';
+import type { Session, TablesInsert, TablesUpdate } from '@stryder/types';
 
 import type { StryderServerClient } from '../server';
 
@@ -99,6 +99,62 @@ export async function createSession(
   };
 
   const { data, error } = await supabase.from('sessions').insert(row).select('*').single();
+
+  if (error) throw error;
+
+  return sessionSchema.parse(data);
+}
+
+const updateSessionSchema = createSessionSchema.extend({
+  session_id: z.uuid(),
+});
+
+export type UpdateSessionInput = z.input<typeof updateSessionSchema>;
+
+/**
+ * Edit an existing session's details — date, type, title, intensity, planned
+ * duration/distance. Re-derives the week the same way createSession() does,
+ * so moving a session's date to a different week reparents it correctly.
+ */
+export async function updateSession(
+  supabase: StryderServerClient,
+  userId: string,
+  input: unknown,
+): Promise<Session> {
+  const parsed = updateSessionSchema.parse(input);
+
+  const block = await getBlock(supabase, parsed.block_id);
+  if (!block) throw new Error('Training block not found.');
+
+  if (parsed.scheduled_date < block.start_date || parsed.scheduled_date > block.end_date) {
+    throw new Error("That date falls outside the block's start and end dates.");
+  }
+
+  const week = await ensureWeek(
+    supabase,
+    userId,
+    block.id,
+    block.start_date,
+    parsed.scheduled_date,
+  );
+
+  const patch: TablesUpdate<'sessions'> = {
+    week_id: week.id,
+    scheduled_date: parsed.scheduled_date,
+    session_type: parsed.session_type,
+    title: parsed.title ?? null,
+    description: parsed.description ?? null,
+    intensity: parsed.intensity ?? null,
+    planned_duration_min: parsed.planned_duration_min ?? null,
+    planned_distance_m: parsed.planned_distance_m ?? null,
+  };
+
+  const { data, error } = await supabase
+    .from('sessions')
+    .update(patch)
+    .eq('id', parsed.session_id)
+    .select('*')
+    .single();
 
   if (error) throw error;
 

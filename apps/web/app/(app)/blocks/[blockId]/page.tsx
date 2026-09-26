@@ -80,7 +80,12 @@ export default async function BlockPage({ params }: { params: Promise<{ blockId:
             </CardHeader>
             <CardContent className="p-0 px-4">
               {sessionsByWeek.get(weekNumber)!.map((session) => (
-                <SessionRow key={session.id} session={session} />
+                <SessionRow
+                  key={session.id}
+                  session={session}
+                  blockStartDate={block.start_date}
+                  blockEndDate={block.end_date}
+                />
               ))}
             </CardContent>
           </Card>

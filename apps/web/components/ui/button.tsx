@@ -2,7 +2,7 @@ import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 import { cn } from '@/lib/cn';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -17,6 +17,11 @@ const variants: Record<ButtonVariant, string> = {
   secondary: 'bg-card text-primary border border-strong hover:bg-hover',
   ghost: 'bg-transparent text-muted border border-transparent hover:bg-hover hover:text-primary',
   danger: 'bg-transparent text-error border border-error/60 hover:bg-error/10',
+  // Accent outline: reads as accent-coloured rather than a solid block, and
+  // the fill-on-hover is a real state change, not just a brightness nudge —
+  // easy to miss on a colour that's already at full saturation.
+  outline:
+    'bg-transparent text-accent border border-accent hover:bg-accent hover:text-accent-contrast',
 };
 
 const sizes: Record<ButtonSize, string> = {

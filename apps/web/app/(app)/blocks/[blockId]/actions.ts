@@ -1,7 +1,13 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { createSession, deleteSession, logSession, updateSessionStatus } from '@stryder/api';
+import {
+  createSession,
+  deleteSession,
+  logSession,
+  updateSession,
+  updateSessionStatus,
+} from '@stryder/api';
 import { createServerSupabaseClient } from '@stryder/api/server';
 
 export interface BoardActionState {
@@ -35,6 +41,31 @@ export async function addSessionAction(
     });
   } catch (error) {
     return { error: error instanceof Error ? error.message : 'Could not add that session.' };
+  }
+
+  if (blockId) revalidatePath(`/blocks/${blockId}`);
+  return { error: null };
+}
+
+export async function editSessionAction(
+  _prevState: BoardActionState,
+  formData: FormData,
+): Promise<BoardActionState> {
+  const blockId = formData.get('block_id')?.toString();
+  try {
+    const { supabase, userId } = await requireUser();
+    await updateSession(supabase, userId, {
+      session_id: formData.get('session_id'),
+      block_id: blockId,
+      scheduled_date: formData.get('scheduled_date'),
+      session_type: formData.get('session_type'),
+      title: formData.get('title')?.toString() || undefined,
+      intensity: formData.get('intensity')?.toString() || undefined,
+      planned_duration_min: formData.get('planned_duration_min')?.toString() || undefined,
+      planned_distance_m: formData.get('planned_distance_m')?.toString() || undefined,
+    });
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : 'Could not save that session.' };
   }
 
   if (blockId) revalidatePath(`/blocks/${blockId}`);

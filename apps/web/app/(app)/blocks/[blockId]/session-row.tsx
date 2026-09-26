@@ -1,9 +1,11 @@
 import { SESSION_TYPE_LABELS } from '@stryder/constants';
+import { formatDistanceMeters, formatDurationMinutes } from '@stryder/utils';
 import type { Session } from '@stryder/types';
 
 import { Badge, Button } from '@/components/ui';
 
 import { markSessionAction, removeSessionAction } from './actions';
+import { EditSessionPanel } from './edit-session-panel';
 import { LogSessionPanel } from './log-session-panel';
 
 const STATUS_TONE = {
@@ -31,7 +33,19 @@ function formatDate(iso: string): string {
   });
 }
 
-export function SessionRow({ session }: { session: Session }) {
+export function SessionRow({
+  session,
+  blockStartDate,
+  blockEndDate,
+}: {
+  session: Session;
+  blockStartDate: string;
+  blockEndDate: string;
+}) {
+  const duration = formatDurationMinutes(session.planned_duration_min);
+  const distance = formatDistanceMeters(session.planned_distance_m);
+  const measures = [duration, distance].filter(Boolean).join(' · ');
+
   return (
     <div className="flex flex-wrap items-center gap-3 border-b border-default py-3 last:border-b-0">
       <span className="w-24 shrink-0 font-mono text-xs text-muted tabular-nums" data-metric>
@@ -42,15 +56,23 @@ export function SessionRow({ session }: { session: Session }) {
         {SESSION_TYPE_LABELS[session.session_type]}
       </Badge>
 
-      <span className="min-w-0 flex-1 truncate text-sm text-primary">
-        {session.title ?? SESSION_TYPE_LABELS[session.session_type]}
-      </span>
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-sm text-primary">
+          {session.title ?? SESSION_TYPE_LABELS[session.session_type]}
+        </span>
+        {measures ? (
+          <span className="font-mono text-xs text-muted tabular-nums" data-metric>
+            {measures}
+          </span>
+        ) : null}
+      </div>
 
       <Badge tone={STATUS_TONE[session.status]} className="shrink-0">
         {STATUS_LABEL[session.status]}
       </Badge>
 
       <div className="flex shrink-0 items-center gap-2">
+        <EditSessionPanel session={session} minDate={blockStartDate} maxDate={blockEndDate} />
         {session.status === 'planned' ? (
           <>
             <LogSessionPanel

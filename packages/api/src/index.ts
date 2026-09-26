@@ -26,7 +26,9 @@ export {
   createSession,
   deleteSession,
   listSessionsForBlock,
+  updateSession,
   updateSessionStatus,
   type CreateSessionInput,
+  type UpdateSessionInput,
 } from './queries/sessions';
 export { logSession, type LogSessionInput } from './queries/session-logs';
