@@ -4,7 +4,7 @@ import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { SPORT_LABELS, SPORTS } from '@stryder/constants';
 
-import { Button, Input, Label, Select } from '@/components/ui';
+import { Button, DateField, Input, Label, Select } from '@/components/ui';
 import { cn } from '@/lib/cn';
 
 import { createBlockAction, type CreateBlockActionState } from './actions';
@@ -102,10 +102,9 @@ export function CreateBlockForm() {
           <Label htmlFor="start_date" required>
             Starts
           </Label>
-          <Input
+          <DateField
             id="start_date"
             name="start_date"
-            type="date"
             required
             value={startDate}
             onChange={(event) => {
@@ -122,10 +121,9 @@ export function CreateBlockForm() {
           <Label htmlFor="end_date" required>
             Ends
           </Label>
-          <Input
+          <DateField
             id="end_date"
             name="end_date"
-            type="date"
             required
             min={startDate}
             value={endDate}

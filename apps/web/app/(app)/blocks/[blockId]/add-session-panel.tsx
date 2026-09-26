@@ -9,7 +9,7 @@ import {
   SESSION_TYPES,
 } from '@stryder/constants';
 
-import { Button, Input, Label, Panel, Select } from '@/components/ui';
+import { Button, DateField, Input, Label, Panel, Select } from '@/components/ui';
 
 import { addSessionAction, type BoardActionState } from './actions';
 
@@ -76,10 +76,9 @@ export function AddSessionPanel({
             <Label htmlFor="scheduled_date" required>
               Date
             </Label>
-            <Input
+            <DateField
               id="scheduled_date"
               name="scheduled_date"
-              type="date"
               min={minDate}
               max={maxDate}
               value={date}

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
+import { Logo } from '@/components/brand/logo';
 import { cn } from '@/lib/cn';
 
 import { NAV_ITEMS } from './nav-items';
@@ -58,7 +59,8 @@ export function SideRail() {
       aria-label="Primary"
       className="hidden w-56 shrink-0 border-r border-default md:flex md:flex-col"
     >
-      <div className="border-b border-default px-5 py-5">
+      <div className="flex items-center gap-2 border-b border-default px-5 py-5">
+        <Logo className="h-4 w-4 text-accent" />
         <span className="font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase">
           Stryder
         </span>

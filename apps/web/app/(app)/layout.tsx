@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getProfile, trialDaysRemaining } from '@stryder/api';
 import { createServerSupabaseClient } from '@stryder/api/server';
 
+import { Logo } from '@/components/brand/logo';
 import { BottomNav, SideRail } from '@/components/nav/app-nav';
 import { Badge } from '@/components/ui';
 
@@ -28,8 +29,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <SideRail />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between gap-4 border-b border-default px-4 py-3 md:px-6">
-          <span className="font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase md:hidden">
-            Stryder
+          <span className="flex items-center gap-2 md:hidden">
+            <Logo className="h-4 w-4 text-accent" />
+            <span className="font-display text-sm font-semibold tracking-[0.2em] text-primary uppercase">
+              Stryder
+            </span>
           </span>
           <div className="ml-auto flex items-center gap-3">
             {trialDays !== null ? (

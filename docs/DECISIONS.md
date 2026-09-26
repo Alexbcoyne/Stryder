@@ -12,16 +12,29 @@ Format: **Decision** — what was chosen, why, and what would change it.
 
 ## Settled by the founder
 
-### D-01 Accent colour: amber — SETTLED 21 Sep 2026
+### D-01 Accent colour: amber, then reversed to the brand green — SUPERSEDED 26 Sep 2026
 
-`--accent` stays amber `#F0A500` for the app UI. The brand's neon green
-`#39FF14` is not promoted to the app accent.
+Originally settled as amber (below), then the founder reversed it: `--accent`
+is now `#39FF14`, the same value as the Elite score band.
 
-This also keeps the score system clean: `#39FF14` is the Elite band colour, and
-a colour that means "you are crushing it" should not also mean "this is a
-button".
+That means a button and a top-tier Stryder Score now render identically —
+exactly the collision the original amber decision was chosen to avoid. Flagged
+at the time; the founder's call stands. If a future session wants to draw a
+line between "accent" and "you're doing great", it needs either a distinct
+accent value again or a different treatment for the Elite band (a border or
+icon rather than colour alone). Nothing about `SCORE_BAND_DEFINITIONS` changed
+as part of this — only `--accent`.
 
-Implemented: `--accent` in `apps/web/app/globals.css`. Nothing else to do.
+Superseded reasoning, kept for context:
+
+> The Technical Spec uses amber `#F0A500` for the app UI; the brand (logo,
+> landing page) uses neon green `#39FF14`. Amber sits behind `--accent` for
+> now, as the brief directs.
+>
+> This needs resolving before the marketing site is built, because the two
+> surfaces will sit side by side. Note that `#39FF14` is also the Elite score
+> colour — using it as the accent would collide with the score system, which
+> is an argument for keeping amber in-app.
 
 ### D-02 Free tier gets no Monday summary — SETTLED 21 Sep 2026
 

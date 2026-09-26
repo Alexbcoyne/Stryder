@@ -2,6 +2,7 @@ export { Badge, type BadgeProps } from './badge';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from './button';
 export { LinkButton, type LinkButtonProps } from './link-button';
 export { Card, CardContent, CardHeader, CardTitle, type CardProps } from './card';
+export { DateField, type DateFieldProps } from './date-field';
 export { EmptyState, type EmptyStateProps } from './empty-state';
 export { Input, type InputProps } from './input';
 export { Label, type LabelProps } from './label';

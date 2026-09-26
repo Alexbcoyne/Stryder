@@ -23,11 +23,10 @@
   --text-primary: #f5f5f0;
   --text-muted: #6b7280;
 
-  /* Accent.
-   * The app UI uses amber. The brand (logo, landing page) uses neon green
-   * #39FF14. Amber sits behind the token for now — this needs a founder
-   * decision, see docs/DECISIONS.md. Change it here, not in components. */
-  --accent: #f0a500;
+  /* Accent — the brand's neon green (D-01, settled). Note it is the same
+   * value as the Elite score band below: a button and a top-tier score now
+   * read identically. Accepted call, recorded in docs/DECISIONS.md. */
+  --accent: #39ff14;
   --accent-contrast: #0f1117;
 
   /* Semantic state. Never used for the Stryder Score. */
@@ -94,6 +93,12 @@
  * ------------------------------------------------------------------------- */
 
 @layer base {
+  /* DateField supplies its own calendar trigger; hiding the browser's own
+   * icon keeps there from being two overlapping clickable targets. */
+  input[type='date']::-webkit-calendar-picker-indicator {
+    display: none;
+  }
+
   * {
     border-color: var(--border);
   }
