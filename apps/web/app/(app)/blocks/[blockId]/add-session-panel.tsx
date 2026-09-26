@@ -15,6 +15,23 @@ import { addSessionAction, type BoardActionState } from './actions';
 
 const INITIAL: BoardActionState = { error: null };
 
+/** Today in the browser's own local date, not UTC. */
+function todayIso(): string {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/** Today if it falls inside the block, otherwise whichever edge is closer. */
+function defaultSessionDate(minDate: string, maxDate: string): string {
+  const today = todayIso();
+  if (today < minDate) return minDate;
+  if (today > maxDate) return maxDate;
+  return today;
+}
+
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
@@ -35,6 +52,9 @@ export function AddSessionPanel({
 }) {
   const [open, setOpen] = useState(false);
   const [state, formAction] = useActionState(addSessionAction, INITIAL);
+  // Defaulted so adding "today's session" — the common case — needs no date
+  // picker interaction at all.
+  const [date, setDate] = useState(() => defaultSessionDate(minDate, maxDate));
 
   // Close the panel once a submission succeeds. Comparing against the last
   // seen state during render (not in an effect) is React's own pattern for
@@ -62,6 +82,8 @@ export function AddSessionPanel({
               type="date"
               min={minDate}
               max={maxDate}
+              value={date}
+              onChange={(event) => setDate(event.target.value)}
               required
             />
           </div>
